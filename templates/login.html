@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="/login" method="POST"/>
+    <table>
+        <tr>
+          <td><h1 id="heading"><strong>BlogTown Login</strong></h1></td>
+          <td></td>
+          <td>
+            <span>If you don't have an account you may <a href="/register">register</a></span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="email">Email</label>
+          </td>
+          <td>
+            <input type="text" name="email" id="email" value="{{email}}"/>
+          </td>
+        <tr/>
+    <tr>
+      <td>
+        <label for="password">Password</label>
+      </td>
+      <td>
+        <input type="password" name="password" id="password" value="{{password}}"/>
+      </td>
+    <tr/>
+    <tr>
+      <td>
+        <input id="submit" value="login" type="submit"/>
+      </td>
+    </tr>
+</form>
+{% endblock %}
