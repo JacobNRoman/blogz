@@ -66,27 +66,32 @@ def login():
 def register():
     if request.method == 'POST':
         email = request.form['email']
+        #TODO: insert some kind of email validation. Regex?
         password = request.form['password']
+        #TODO: insert a minimum password length. Complexity checker?
         verify = request.form['verify']
-
-        # TODO - validate user's data
-
+        if not email or not password or not verify:
+            flash("You must provide a valid email, password, and password verification")
+            return redirect("/register")
+        if password != verify:
+            flash("Password and verification fields do not match")
+            return redirect('/register')
         existing_user = User.query.filter_by(email=email).first()
         if not existing_user:
             new_user = User(email, password)
             db.session.add(new_user)
             db.session.commit()
             session['email'] = email
-            return redirect('/')
+            return redirect('/blog')
         else:
-            #TODO - better response
-            return '<h1>Duplicate user</h1>'
+            flash("User with this email already exists")
+            return redirect('/register')
     return render_template('register.html')
 
 @app.route('/logout')
 def logout():
     del session['email']
-    return redirect('/')
+    return redirect('/login')
 
 @app.route('/blog', methods=['POST', 'GET'])
 def index():

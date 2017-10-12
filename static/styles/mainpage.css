@@ -1,5 +1,5 @@
 nav > div {
-    color: red;
+    color: tomato;
   }
 
   .flex-container {
@@ -30,7 +30,7 @@ textarea {
 }
 
 #newpostTitle {
-    width: 100px;
+    width: 150px;
 }
 
 
@@ -38,6 +38,7 @@ textarea {
     -webkit-flex: 2;
     flex: 2;
     background-color: lightgrey;
+    padding: 5px;
 }
 
 .left {
@@ -58,4 +59,8 @@ textarea {
 
 # content {
     text-align: left;
+}
+
+table {
+    width: 100vh;
 }
