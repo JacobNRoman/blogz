@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -14,12 +15,17 @@ class BlogPost(db.Model):
     title = db.Column(db.String(256))
     body = db.Column(db.String(10000))
     deleted = db.Column(db.Boolean)
+    pub_date = db.Column(db.DateTime)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    
 
-    def __init__(self, title, body, owner):
+    def __init__(self, title, body, owner, pub_date=None):
         self.title = title
         self.body = body
         self.deleted = False
+        if pub_date is None:
+            pub_date = datetime.utcnow()
+        self.pub_date = pub_date
         self.owner = owner
 
 
@@ -85,7 +91,7 @@ def logout():
 @app.route('/blog', methods=['POST', 'GET'])
 def index():
     owner = User.query.filter_by(email=session['email']).first()
-    blog = BlogPost.query.filter_by(deleted=False, owner=owner).all()
+    blog = BlogPost.query.filter_by(deleted=False, owner=owner).order_by(BlogPost.pub_date.desc()).all()
     blog_id = request.args.get('id')
     if not blog_id:
         return render_template("blog.html", title="Blog Town!", blog=blog)
