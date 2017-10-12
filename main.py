@@ -50,7 +50,7 @@ def login():
         if user and user.password == password:
             session['email'] = email
             flash("Logged in")
-            return redirect('/')
+            return redirect('/blog')
         else:
             flash('User password incorrect, or user does not exist', 'error')
 
@@ -111,15 +111,15 @@ def newpost():
     return render_template('newpost.html')
 
 
-@app.route('/delete-task', methods=['POST'])
+@app.route('/delete', methods=['POST'])
 def delete_task():
-    task_id = int(request.form['task-id'])
-    task = Task.query.get(task_id)
-    task.completed = True
-    db.session.add(task)
+    blog_id = int(request.form['blog-id'])
+    blog = BlogPost.query.get(blog_id)
+    blog.deleted = True
+    db.session.add(blog)
     db.session.commit()
 
-    return redirect('/')
+    return redirect('/blog')
 
 
 if __name__ == '__main__':

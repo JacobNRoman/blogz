@@ -1,14 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Blog Time!</h1>
+  <h1 class="title">Blog Town!</h1>
+  <hr/>
+  <hr/>
   <form method='post'>
       <h1>New Blog Post</h1>
-      <label>Title:
+      <label id="newpostTitle">Title:
           <input type="text" name="title" />
       </label>
+      <hr/>
       <label>Body:
-          <input type="text" name="body" />
+          <textarea name="body" /></textarea>
       </label>
       <input type="submit" value="Submit New Post" />
   </form>

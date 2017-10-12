@@ -2,29 +2,27 @@
 <html>
   <head>
     <title>{{title}}</title>
-    <style>
-      .error {
-        color: red;
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/mainpage.css') }}" />
   </head>
   <body>
-      <div>
-        <a href='/blog'>Main Page</a>
-        <a href='/newpost'>Add a new post</a>
-        <a href='/logout'>log out!</a>
+      <nav>
+        <a class='flex-item nav' href='/blog'>Main Page</a>
+        <a class='flex-item nav' href='/newpost'>Add a new post</a>
+        <a class='flex-item nav' href='/logout'>log out</a>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+          {% for category, message in messages %}
+            <div class="flex-item nav">{{message}}</div>
+          {% endfor %}
+        {% endwith %}
+    </nav>
+    <div class="flex-container"/>
+      <div class="flex-item left"></div>
+      <div class="flex-item body">
+        {% block content %}
+        {% endblock %}
       </div>
-
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        <ul>
-        {% for category, message in messages %}
-          <li class="{{category}}">{{message}}</li>
-        {% endfor %}
-        </ul>
-    {% endwith %}
-
-    {% block content %}
-    {% endblock %}
+      <div class="flex-item right"></div>
+    </div>
 
   </body>
 </html>
