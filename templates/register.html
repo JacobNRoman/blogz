@@ -2,38 +2,13 @@
 
 {% block content %}
 <form action="/register" method="POST"/>
-    <table>
-        <tr>
-          <td><h1 id="heading"><strong>BlogTown Registration</strong></h1></td>
-        </tr>
-        <tr>
-          <td>
-            <label for="email">Email</label>
-          </td>
-          <td>
-            <input type="text" name="email" id="email" value="{{email}}"/>
-          </td>
-        </tr>
-    <tr>
-      <td>
-        <label for="password">Password</label>
-      </td>
-      <td>
-        <input type="password" name="password" id="password" value="{{password}}"/>
-      </td>
-    <tr/>
-    <tr>
-      <td>
-        <label for="verify">Verify password</label>
-      </td>
-      <td>
-        <input type="password" name="verify" id="verify" value="{{verify}}"/>
-      </td>
-    <tr/>
-    <tr>
-      <td>
-        <input id="submit" value="register" type="submit"/>
-      </td>
-    </tr>
+    <div class="flex-item login"><h1 id="heading"><strong>Registration</strong></h1></div>
+    <div class="flex-item login"><label for="email">Email</label></div>
+    <div class="flex-item login"><input type="text" name="email" id="email" value="{{email}}"/></div>
+    <div class="flex-item login"><label for="password">Password</label></div>
+    <div class="flex-item login"><input type="password" name="password" id="password" value="{{password}}"/></div>
+    <div class="flex-item login"><label for="verify">Verify password</label></div>
+    <div class="flex-item login"><input type="password" name="verify" id="verify" value="{{verify}}"/></div>
+    <div class="flex-item login"><input id="submit" value="register" type="submit"/></div>
 </form>
 {% endblock %}
