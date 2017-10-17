@@ -4,5 +4,6 @@
 <h1 class="title">{{post.title}}</h1>
 <hr/>
 <p class="content">{{post.body}}</p>
+<h6>Written by: <a href='blog?user={{user.id}}'>{{user.email}}</a> on: {{post.pub_date}}</h6>
 
 {% endblock %}

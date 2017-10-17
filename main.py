@@ -4,7 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://build-a-blog:lc101@localhost:8889/build-a-blog'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:ruletheworld@localhost:8889/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 app.secret_key = 'y33kGcyk&P3B'
@@ -42,7 +42,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'register']
+    allowed_routes = ['login', 'register', 'blog', 'index']
     if request.endpoint not in allowed_routes and 'email' not in session:
         return redirect('/login')
 
@@ -56,7 +56,7 @@ def login():
         if user and user.password == password:
             session['email'] = email
             flash("Logged in")
-            return redirect('/blog')
+            return redirect('/newpost')
         else:
             flash('User password incorrect, or user does not exist', 'error')
 
@@ -68,10 +68,16 @@ def register():
         email = request.form['email']
         #TODO: insert some kind of email validation. Regex?
         password = request.form['password']
-        #TODO: insert a minimum password length. Complexity checker?
+        #TODO: Complexity checker?
         verify = request.form['verify']
         if not email or not password or not verify:
             flash("You must provide a valid email, password, and password verification")
+            return redirect("/register")
+        if len(email) < 4:
+            flash("Username must be longer than three characters")
+            return redirect("/register")
+        if len(password) < 4:
+            flash("Password must be longer than three characters")
             return redirect("/register")
         if password != verify:
             flash("Password and verification fields do not match")
@@ -91,15 +97,40 @@ def register():
 @app.route('/logout')
 def logout():
     del session['email']
-    return redirect('/login')
+    return redirect('/blog')
+
+@app.route("/")
+def index():
+    users = User.query.all()
+    return render_template('index.html', users=users)
 
 @app.route('/blog', methods=['POST', 'GET'])
-def index():
+def blog():
+    blog_id = request.args.get('id')
+    user_id = request.args.get('user')
+    # blog_id only exists if the user clicks on a specific post's heading. The code below renders a specific post's page if blog_id exists.
+    if blog_id:
+        post = BlogPost.query.filter_by(id=blog_id).first()
+        user = User.query.filter_by(id=post.owner_id).first()
+        return render_template("post.html", post=post, user=user)
+    if user_id:
+        user = User.query.filter_by(id=user_id).first()
+        blog = BlogPost.query.filter_by(deleted=False, owner_id=user_id).order_by(BlogPost.pub_date.desc()).all()
+        return render_template("authorblog.html", blog=blog, user=user)
+    else:
+        user = User.query.all()
+        blog = BlogPost.query.filter_by(deleted=False).order_by(BlogPost.pub_date.desc()).all()   
+        return render_template("blog.html", title="Blog Town!", blog=blog, user=user)
+        
+
+@app.route('/userblog', methods=['POST', 'GET'])
+def users_blog():
     owner = User.query.filter_by(email=session['email']).first()
     blog = BlogPost.query.filter_by(deleted=False, owner=owner).order_by(BlogPost.pub_date.desc()).all()
     blog_id = request.args.get('id')
+    # blog_id only exists if the user clicks on a specific post's heading. The code below renders a specific post's page if blog_id exists.
     if not blog_id:
-        return render_template("blog.html", title="Blog Town!", blog=blog)
+        return render_template("userblog.html", title="Blog Town!", blog=blog)
     else:
         post = BlogPost.query.filter_by(id=blog_id).first()
         return render_template("post.html", post=post)

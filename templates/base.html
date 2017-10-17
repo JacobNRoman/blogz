@@ -9,9 +9,11 @@
         <h1>Blog Town!</h1>
       </div>
       <nav>
-        <a class='flex-item nav' href='/blog'>Main Page</a>
+        <a class='flex-item nav' href="/">Home</a>
+        <a class='flex-item nav' href='/blog'>All Posts</a>
+        <a class='flex-item nav' href='/userblog'>Your Blog</a>
         <a class='flex-item nav' href='/newpost'>Add a new post</a>
-        <a class='flex-item nav' href='/logout'>log out</a>
+        <a class='flex-item nav' href='/logout'>Log out</a>
         {% with messages = get_flashed_messages(with_categories=True) %}
           {% for category, message in messages %}
             <div class="flex-item nav">{{message}}</div>

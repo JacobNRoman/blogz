@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if blog|length == 0 %}
+  <p>No posts yet</p>
+  {% else %}
+        {% for blogs in blog %}
+        <h4><a class="title" href='/blog?id={{blogs.id}}'>{{blogs.title}}</a></h4>
+        <p class="content">{{blogs.body}}</p>
+        <form method="POST" action="/delete" style="display:inline-block">
+            <input type="hidden" name="blog-id" value="{{blogs.id}}" />
+            <input type="submit" value="Delete Post" />
+        </form>
+        <hr/>
+        {% endfor %}
+  {% endif %}
+{% endblock %}
