@@ -110,7 +110,8 @@ def index():
     return render_template('index.html', users=users)
 
 @app.route('/blog', methods=['POST', 'GET'])
-def blog():
+@app.route('/blog/<int:page_num>')
+def blog(page_num=1):
     # blog renders a list of all blog posts by all authors. It also contains several subroutes using query parameters for reaching specific posts and author's blogs. 
     blog_id = request.args.get('id')
     user_id = request.args.get('user')
@@ -127,7 +128,7 @@ def blog():
     else:
         # this renders the 'normal' blog page
         user = User.query.all()
-        blog = BlogPost.query.filter_by(deleted=False).order_by(BlogPost.pub_date.desc()).all()   
+        blog = BlogPost.query.filter_by(deleted=False).order_by(BlogPost.pub_date.desc()).paginate(per_page=5, page=page_num, error_out=True)  
         return render_template("blog.html", title="Blog Town!", blog=blog, user=user)
         
 
@@ -159,8 +160,9 @@ def newpost():
         db.session.commit()
         new_post_id = new_post.id
         post = BlogPost.query.filter_by(id=new_post_id).first()
+        user = User.query.filter_by(id=post.owner_id).first()
         # after a new post is submitted the user is redirected to that new post's individual page. 
-        return render_template("post.html", post=post)
+        return render_template("post.html", post=post, user=user)
     return render_template('newpost.html')
 
 
