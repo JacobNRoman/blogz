@@ -54,7 +54,9 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
         if user and user.password == password:
+            # This elegantly validates for us. "if user" will return false if the query fails(meaning username was entered wrong) and the second clause makes sure the password that was entered matches the password on file. 
             session['email'] = email
+            #creates the session['email'] object that allows us to have a persistent login
             flash("Logged in")
             return redirect('/newpost')
         else:
@@ -66,10 +68,11 @@ def login():
 def register():
     if request.method == 'POST':
         email = request.form['email']
-        #TODO: insert some kind of email validation. Regex?
+        #TODO: insert some kind of email validation. Regex? NOTE: current build uses usernames, not email. So, substitute TODO: refactor code to stop using 'email' keyword and use username instead.
         password = request.form['password']
         #TODO: Complexity checker?
         verify = request.form['verify']
+        # everything below is layers of validation.
         if not email or not password or not verify:
             flash("You must provide a valid email, password, and password verification")
             return redirect("/register")
@@ -84,6 +87,7 @@ def register():
             return redirect('/register')
         existing_user = User.query.filter_by(email=email).first()
         if not existing_user:
+            # This only runs if registration is successful
             new_user = User(email, password)
             db.session.add(new_user)
             db.session.commit()
@@ -101,11 +105,13 @@ def logout():
 
 @app.route("/")
 def index():
+    # This renders the 'Home' page, which is a list of all users that links to each individual user's blog page. 
     users = User.query.all()
     return render_template('index.html', users=users)
 
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
+    # blog renders a list of all blog posts by all authors. It also contains several subroutes using query parameters for reaching specific posts and author's blogs. 
     blog_id = request.args.get('id')
     user_id = request.args.get('user')
     # blog_id only exists if the user clicks on a specific post's heading. The code below renders a specific post's page if blog_id exists.
@@ -113,11 +119,13 @@ def blog():
         post = BlogPost.query.filter_by(id=blog_id).first()
         user = User.query.filter_by(id=post.owner_id).first()
         return render_template("post.html", post=post, user=user)
+    # user_id is provided by the author headings on index and below posts. 
     if user_id:
         user = User.query.filter_by(id=user_id).first()
         blog = BlogPost.query.filter_by(deleted=False, owner_id=user_id).order_by(BlogPost.pub_date.desc()).all()
         return render_template("authorblog.html", blog=blog, user=user)
     else:
+        # this renders the 'normal' blog page
         user = User.query.all()
         blog = BlogPost.query.filter_by(deleted=False).order_by(BlogPost.pub_date.desc()).all()   
         return render_template("blog.html", title="Blog Town!", blog=blog, user=user)
@@ -125,6 +133,7 @@ def blog():
 
 @app.route('/userblog', methods=['POST', 'GET'])
 def users_blog():
+    # users_blog exists to provide a page that displays a current users personal blog and allows them to delete their posts. 
     owner = User.query.filter_by(email=session['email']).first()
     blog = BlogPost.query.filter_by(deleted=False, owner=owner).order_by(BlogPost.pub_date.desc()).all()
     blog_id = request.args.get('id')
@@ -139,6 +148,7 @@ def users_blog():
 def newpost():
     owner = User.query.filter_by(email=session['email']).first()
     if request.method == 'POST':
+        # the indented code below handles the submission and creation of a new post
         blog_title = request.form['title']
         blog_body = request.form['body']
         if not blog_title or not blog_body:
@@ -149,19 +159,21 @@ def newpost():
         db.session.commit()
         new_post_id = new_post.id
         post = BlogPost.query.filter_by(id=new_post_id).first()
+        # after a new post is submitted the user is redirected to that new post's individual page. 
         return render_template("post.html", post=post)
     return render_template('newpost.html')
 
 
 @app.route('/delete', methods=['POST'])
-def delete_task():
+def delete_post():
+    # this function handles the deleting of posts that occurs on userblog
     blog_id = int(request.form['blog-id'])
     blog = BlogPost.query.get(blog_id)
     blog.deleted = True
     db.session.add(blog)
     db.session.commit()
 
-    return redirect('/blog')
+    return redirect('/userblog')
 
 
 if __name__ == '__main__':
