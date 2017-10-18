@@ -6,14 +6,18 @@
             {% if users.id == blogs.owner_id %}
               <h4><a class="title" href='/blog?id={{blogs.id}}'>{{blogs.title}}</a></h4>
               <p class="content">{{blogs.body}}</p>
-              <h6>Written by: <a href='blog?user={{users.id}}'>{{users.email}}</a> on: {{blogs.pub_date}}</h6>
+              <h6>Written by: <a href="{{url_for('blog', user=users.id)}}">{{users.email}}</a> on: {{blogs.pub_date}}</h6>
               <hr/>
             {% endif %}
           {% endfor %}
         {% endfor %}
         {% for page in blog.iter_pages() %}
             {% if page %}
-              <a href="{{ url_for('blog', page_num=page) }}">{{page}}</a>
+              {% if page != blog.page %}
+                <a href="{{ url_for('blog', page_num=page) }}">{{page}}</a>
+              {% else %}
+                <strong>{{page}}</strong>
+              {% endif %}
             {% else %}
               ...
             {% endif %}

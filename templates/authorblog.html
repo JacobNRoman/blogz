@@ -2,13 +2,20 @@
 
 {% block content %}
   <h1>{{user.email}}'s Blog</h1>
-  {% if blog|length == 0 %}
-  <p>No posts yet</p>
+  {% for blogs in blog.items %}
+    <h4><a class="title" href='/blog?id={{blogs.id}}'>{{blogs.title}}</a></h4>
+    <p class="content">{{blogs.body}}</p>
+    <hr/>
+  {% endfor %}
+  {% for page in blog.iter_pages() %}
+    {% if page %}
+      {% if page != blog.page %}
+        <a href="/blog/{{page}}?user={{user.id}}">{{page}}</a>
+    {% else %}
+      <strong>{{page}}</strong>
+    {% endif %}
   {% else %}
-        {% for blogs in blog %}
-        <h4><a class="title" href='/blog?id={{blogs.id}}'>{{blogs.title}}</a></h4>
-        <p class="content">{{blogs.body}}</p>
-        <hr/>
-        {% endfor %}
+    ...
   {% endif %}
+  {% endfor %}
 {% endblock %}

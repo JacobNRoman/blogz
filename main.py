@@ -111,7 +111,7 @@ def index():
 
 @app.route('/blog', methods=['POST', 'GET'])
 @app.route('/blog/<int:page_num>')
-def blog(page_num=1):
+def blog(page_num=None):
     # blog renders a list of all blog posts by all authors. It also contains several subroutes using query parameters for reaching specific posts and author's blogs. 
     blog_id = request.args.get('id')
     user_id = request.args.get('user')
@@ -123,7 +123,7 @@ def blog(page_num=1):
     # user_id is provided by the author headings on index and below posts. 
     if user_id:
         user = User.query.filter_by(id=user_id).first()
-        blog = BlogPost.query.filter_by(deleted=False, owner_id=user_id).order_by(BlogPost.pub_date.desc()).all()
+        blog = BlogPost.query.filter_by(deleted=False, owner_id=user_id).order_by(BlogPost.pub_date.desc()).paginate(per_page=5, page=page_num, error_out=True)
         return render_template("authorblog.html", blog=blog, user=user)
     else:
         # this renders the 'normal' blog page
