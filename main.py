@@ -1,6 +1,7 @@
 from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import hashlib
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -33,12 +34,20 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True)
-    password = db.Column(db.String(120))
+    pw_hash = db.Column(db.String(120))
     blog = db.relationship('BlogPost', backref='owner')
 
     def __init__(self, email, password):
         self.email = email
-        self.password = password
+        self.pw_hash = make_pw_hash(password)
+
+def make_pw_hash(password):
+    return hashlib.sha256(str.encode(password)).hexdigest()
+
+def check_pw_hash(password, hash):
+    if make_pw_hash(password) == hash:
+        return True
+    return False
 
 @app.before_request
 def require_login():
@@ -53,8 +62,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
-        if user and user.password == password:
-            # This elegantly validates for us. "if user" will return false if the query fails(meaning username was entered wrong) and the second clause makes sure the password that was entered matches the password on file. 
+        if user and check_pw_hash(password, user.pw_hash):
             session['email'] = email
             #creates the session['email'] object that allows us to have a persistent login
             flash("Logged in")
